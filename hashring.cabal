@@ -2,10 +2,10 @@ name: hashring
 version: 0.0.0
 license: BSD3
 license-file: LICENSE.md
-author: Mike Craig <mkscrg@gmail.com>
-maintainer: Mike Craig <mkscrg@gmail.com>
+author: Michael S. Craig <mkscrg@gmail.com>
+maintainer: Michael S. Craig <mkscrg@gmail.com>
 stability: experimental
-synopsis: Map items to buckets using consistent hashing
+synopsis: Map items to nodes using consistent hashing
 description: See the documentation in Data.HashRing.
 homepage:
   http://hackage.haskell.org/packages/archive/hashring/latest/doc/html/Data-HashRing.html
@@ -21,6 +21,7 @@ library
   build-depends:
     base >= 4 && < 5,
     containers >= 0.4 && < 0.5,
+    data-default < 0.4,
     hashable >= 1.1.1 && < 1.2
 
 source-repository head
