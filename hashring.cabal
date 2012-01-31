@@ -1,23 +1,21 @@
 name: hashring
 version: 0.0.0
-cabal-version: >= 1.6
+license: BSD3
+license-file: LICENSE
+author: Mike Craig <mkscrg@gmail.com>
+maintainer: Mike Craig <mkscrg@gmail.com>
+synopsis: Map items to buckets using consistent hashing
+description: See the haddocks for Data.HashRing.
+category: Data
 build-type: Simple
+cabal-version: >= 1.9.2
+extra-source-files: README.md
 
 library
-    exposed-modules:
-        Data.HashRing
-    ghc-options: -Wall -O2
-    build-depends:
-        base >= 4 && < 5,
-        containers,
-        hashable
-
---library
---    exposed-modules:
---        Test
---    ghc-options: -Wall -O2
---    build-depends:
---        base >= 4 && < 5,
---        bytestring,
---        cryptohash,
---        hashable
+  exposed-modules:
+    Data.HashRing
+  ghc-options: -Wall -O2
+  build-depends:
+    base >= 4 && < 5,
+    containers >= 4 && < 5,
+    hashable >= 1.1.1 && < 1.2
