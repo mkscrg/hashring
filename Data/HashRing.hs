@@ -34,7 +34,7 @@
 -- referenced by /k'/. Higher values of /R/ give a more even distribution of
 -- keys to nodes but slow down insertions and deletions of nodes. /R/ is
 -- specified when constructing a 'HashRing' with 'empty', 'singleton', or
--- 'fromList' and retrievable with 'nReplicas'.
+-- 'fromList' and retrievable with 'replicas'.
 --
 -- The ability of 'HashRing' to fairly distribute messages among nodes relies
 -- on the implementations of 'Data.Hashable.hashWithSalt' for the message and
@@ -48,7 +48,6 @@
 module Data.HashRing (
   -- * Map type
   HashRing
-, nReplicas
   -- * Construction
 , empty
 , singleton
@@ -57,6 +56,7 @@ module Data.HashRing (
   -- * Query
 , null
 , size
+, replicas
 , member
 , lookup
 , find
@@ -86,14 +86,24 @@ import qualified Data.Set as S
 data HashRing a = HashRing
   { nodeMap :: IntMap a
   , nodeSet :: Set a
-  , nReplicas :: Int
+  , replicas :: Int
   -- ^ Number of replica nodes (/R/) in the ring for each real node.
   }
 
 
---instance Show a => Show (HashRing a) where
+instance Show a => Show (HashRing a) where
+  showsPrec d ring = showParen (d > 10)
+                   $ showString "fromList "
+                   . shows (replicas ring)
+                   . showString " "
+                   . shows (toList ring)
 
---instance Read a => Read (HashRing a) where
+instance (Read a, Ord a, Hashable a) => Read (HashRing a) where
+  readsPrec d = readParen (d > 10) $ \s -> do
+    ("fromList", s') <- lex s
+    (nreps, s'') <- reads s'
+    (nodes, s''') <- reads s''
+    return (fromList nreps nodes, s''')
 
 
 -- | Construct an empty ring with a specific /R/ value.
@@ -116,6 +126,7 @@ size ring = S.size $ nodeSet ring
 -- | @True@ if the node is in the ring, @False@ otherwise.
 member :: Ord a => a -> HashRing a -> Bool
 member node ring = S.member node $ nodeSet ring
+
 
 -- | Get the node in the ring corresponding to a message, or @Nothing@ if the
 -- ring is empty.
@@ -147,7 +158,7 @@ insert node ring
   | S.member node $ nodeSet ring = ring
   | otherwise = ring
     { nodeMap = foldr (\key nmap -> IM.insert key node nmap) (nodeMap ring)
-              $ take (nReplicas ring)
+              $ take (replicas ring)
               $ filter (\key -> not $ IM.member key (nodeMap ring))
               $ nodeKeys node
     , nodeSet = S.insert node (nodeSet ring) }
@@ -158,10 +169,11 @@ delete node ring
   | not $ S.member node $ nodeSet ring = ring
   | otherwise = ring
     { nodeMap = foldr (\key nmap -> IM.delete key nmap) (nodeMap ring)
-              $ take (nReplicas ring)
+              $ take (replicas ring)
               $ filter (\key -> IM.lookup key (nodeMap ring) == Just node)
               $ nodeKeys node
     , nodeSet = S.delete node (nodeSet ring) }
+
 
 -- | Construct a ring from an /R/ value and a list of nodes.
 fromList :: (Ord a, Hashable a) => Int -> [a] -> HashRing a
