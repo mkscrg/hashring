@@ -88,7 +88,7 @@ data HashRing a = HashRing
   , nodeSet :: Set a
   , replicas :: Int
   -- ^ Number of replica nodes (/R/) in the ring for each real node.
-  }
+  } deriving (Eq)
 
 
 instance Show a => Show (HashRing a) where
