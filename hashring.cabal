@@ -23,11 +23,17 @@ library
     containers >= 0.4 && < 0.5,
     hashable >= 1.1.1 && < 1.2
 
---executable tests
---  main-is: Tests.hs
---  ghc-options: -Wall -O2
---  build-depends:
---    base >= 4 && < 5
+test-suite tests
+  type: exitcode-stdio-1.0
+  main-is: Properties.hs
+  hs-source-dirs: tests
+  ghc-options: -Wall -O2
+  build-depends:
+    base >= 4 && < 5,
+    hashring,
+    test-framework,
+    test-framework-quickcheck2,
+    QuickCheck
 
 source-repository head
   type: git
