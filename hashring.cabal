@@ -27,7 +27,7 @@ test-suite tests
   type: exitcode-stdio-1.0
   main-is: Properties.hs
   hs-source-dirs: tests
-  ghc-options: -Wall -O2
+  ghc-options: -Wall -O2 -fno-warn-orphans -fhpc
   build-depends:
     base >= 4 && < 5,
     hashring,
