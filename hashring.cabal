@@ -15,9 +15,15 @@ build-type: Simple
 cabal-version: >= 1.9.2
 extra-source-files: README.md
 
+flag hpc
+  description: Build the library with code coverage hooks
+  default: False
+
 library
   exposed-modules: Data.HashRing
   ghc-options: -Wall -O2
+  if flag(hpc)
+    ghc-options: -fhpc
   build-depends:
     base >= 4 && < 5,
     containers >= 0.4 && < 0.5,
@@ -27,7 +33,7 @@ test-suite tests
   type: exitcode-stdio-1.0
   main-is: Properties.hs
   hs-source-dirs: tests
-  ghc-options: -Wall -O2 -fno-warn-orphans -fhpc
+  ghc-options: -Wall -O2 -fno-warn-orphans
   build-depends:
     base >= 4 && < 5,
     hashring,
