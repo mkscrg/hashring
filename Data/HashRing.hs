@@ -148,8 +148,8 @@ find msg ring = case lookup msg ring of
 
 -- | Get the node in the ring corresponding to a message, or error if the ring
 -- is empty.
-(!) :: Hashable b => b -> HashRing a -> a
-msg ! ring = find msg ring
+(!) :: Hashable b => HashRing a -> b -> a
+ring ! msg = find msg ring
 
 
 -- | Add a node to the ring.

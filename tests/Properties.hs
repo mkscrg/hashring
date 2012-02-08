@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Data.HashRing (HashRing)
+import Data.HashRing (HashRing, (!))
 import qualified Data.HashRing as R
 import Data.List ((\\), nub)
 import Data.Word (Word8)
@@ -17,17 +17,24 @@ main = defaultMain
     [ testProperty "empty ring is null" pEmptyIsNull
     , testProperty "nonempty rings are not null" pNonemptyNonNull
     , testProperty "size is # of nodes" pSize
-    , testProperty "replicas is # of replicas" pReplicas ]
+    , testProperty "replicas is # of replicas" pReplicas
+    , testProperty "equality" pInequality ]
   , testGroup "query properties"
-    [ testProperty "member identity" pMember
-    , testProperty "lookup identity" pLookup
-    , testProperty "find identity" pFind ]
+    [ testProperty "lookup in empty ring" pLookupEmpty
+    , testProperty "member identity" pMember
+    , testProperty "lookup identity" pLookupId
+    , testProperty "find identity" pFindId
+    , testProperty "index (bang) identity" pIndexId
+    , testProperty "lookup not Nothing" pLookupJust
+    , testProperty "lookup wraps" pLookupWrap ]
   , testGroup "insert/delete properties"
     [ testProperty "insert into empty" pSingleton
     , testProperty "insert idempotency" pInsertIdem
     , testProperty "insert then delete" pInsertDelete
     , testProperty "delete nonmember" pDeleteNonMember ]
-  , testProperty "list conversion" pListConvert ]
+  , testGroup "conversion properties"
+    [ testProperty "show/read identity" pShowRead
+    , testProperty "list conversion" pListConvert ] ]
 
 
 type IRing = HashRing Int
@@ -58,18 +65,37 @@ pSize (NReps nreps) nodes = go nodes $ R.empty nreps
 pReplicas :: NReps -> Bool
 pReplicas (NReps nreps) = R.replicas (R.empty nreps) == nreps
 
-pSingleton :: NReps -> Int -> Bool
-pSingleton (NReps nreps) node =
-  R.insert node (R.empty nreps) == R.singleton nreps node
+pInequality :: NReps -> Int -> Bool
+pInequality (NReps nreps) node = R.singleton nreps node /= R.empty nreps
+
+
+pLookupEmpty :: Int -> NReps -> Bool
+pLookupEmpty node (NReps nreps) =
+  R.lookup node (R.empty nreps :: IRing) == Nothing
 
 pMember :: Int -> IRing -> Bool
 pMember node ring = R.member node (R.insert node ring) == True
 
-pLookup :: Int -> IRing -> Bool
-pLookup node ring = R.lookup node (R.insert node ring) == Just node
+pLookupId :: Int -> IRing -> Bool
+pLookupId msgnode ring = R.lookup msgnode (R.insert msgnode ring) == Just msgnode
 
-pFind :: Int -> IRing -> Bool
-pFind node ring = R.find node (R.insert node ring) == node
+pFindId :: Int -> IRing -> Bool
+pFindId msgnode ring = R.find msgnode (R.insert msgnode ring) == msgnode
+
+pIndexId :: Int -> IRing -> Bool
+pIndexId msgnode ring = R.insert msgnode ring ! msgnode == msgnode
+
+pLookupJust :: Int -> IRing -> Property
+pLookupJust msg ring = not (R.null ring) ==> R.lookup msg ring /= Nothing
+
+pLookupWrap :: Int -> NReps -> Property
+pLookupWrap msgnode (NReps nreps) = msgnode /= maxBound ==>
+  R.lookup (msgnode + 1) (R.insert msgnode $ R.empty nreps) == Just msgnode
+
+
+pSingleton :: NReps -> Int -> Bool
+pSingleton (NReps nreps) node =
+  R.insert node (R.empty nreps) == R.singleton nreps node
 
 pInsertIdem :: Int -> IRing -> Bool
 pInsertIdem node ring =
@@ -81,6 +107,10 @@ pInsertDelete node ring = ring == R.delete node (R.insert node ring)
 pDeleteNonMember :: Int -> IRing -> Property
 pDeleteNonMember node ring =
   not (R.member node ring) ==> R.delete node ring == ring
+
+
+pShowRead :: IRing -> Bool
+pShowRead ring = ring == read (show ring)
 
 pListConvert :: NReps -> [Int] -> Bool
 pListConvert (NReps nreps) ints =
