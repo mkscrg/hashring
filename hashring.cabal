@@ -5,8 +5,10 @@ license-file: LICENSE.md
 author: Michael S. Craig <mkscrg@gmail.com>
 maintainer: Michael S. Craig <mkscrg@gmail.com>
 stability: experimental
-synopsis: Map items to nodes using consistent hashing
-description: See the documentation in Data.HashRing.
+synopsis: Efficient consistent hashing.
+description:
+  An efficient implementation of consistent hashing. See the documentation for
+  @Data.HashRing@ for more info.
 homepage:
   http://hackage.haskell.org/packages/archive/hashring/latest/doc/html/Data-HashRing.html
 bug-reports: https://github.com/mkscrg/hashring/issues

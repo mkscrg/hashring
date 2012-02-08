@@ -7,9 +7,9 @@
 --
 -- An efficient implementation of consistent hashing, as described in
 --
---    * David Karger et al., \"/Consistent hashing and random trees:
---    distributed caching protocols for relieving hot spots on the World Wide
---    Web/\", 29th Annual ACM Symposium on Theory,
+--    * David Karger et al.,
+--    \"/Consistent hashing and random trees: distributed caching protocols for relieving hot spots on the World Wide Web/\",
+--    29th Annual ACM Symposium on Theory,
 --    <http://dl.acm.org/citation.cfm?id=258660>
 --
 -- In distributed computing applications, it's usually necessary route messages
