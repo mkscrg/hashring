@@ -9,8 +9,7 @@ synopsis: Efficient consistent hashing.
 description:
   An efficient implementation of consistent hashing. See the documentation for
   @Data.HashRing@ for more info.
-homepage:
-  http://hackage.haskell.org/packages/archive/hashring/latest/doc/html/Data-HashRing.html
+homepage: https://github.com/mkscrg/hashring
 bug-reports: https://github.com/mkscrg/hashring/issues
 category: Data
 build-type: Simple
