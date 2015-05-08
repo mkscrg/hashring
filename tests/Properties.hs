@@ -102,7 +102,9 @@ pInsertIdem node ring =
   R.insert node (R.insert node ring) == R.insert node ring
 
 pInsertDelete :: Int -> IRing -> Bool
-pInsertDelete node ring = ring == R.delete node (R.insert node ring)
+pInsertDelete node ring
+    | (R.member node ring) = True -- if item is in ring - it's removing will break the ring
+    | otherwise = ring == R.delete node (R.insert node ring)
 
 pDeleteNonMember :: Int -> IRing -> Property
 pDeleteNonMember node ring =
